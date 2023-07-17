@@ -3,7 +3,10 @@ use itertools::Itertools;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-use walkdir::{DirEntry, WalkDir};
+use utils::{is_hidden, is_markdown};
+use walkdir::WalkDir;
+
+mod utils;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -15,7 +18,7 @@ pub enum Error {
     #[error("No metadata found")]
     MissingMetadata,
 
-    #[error("No closing ---")]
+    #[error("No closing --- for metadata found")]
     UnclosedMetadata,
 
     #[error("Error parsing yaml metadata {0:?}")]
@@ -63,18 +66,6 @@ impl VaultNote {
     pub fn metadata<T: DeserializeOwned>(&self) -> Result<T> {
         self.parts()?.0.ok_or(MissingMetadata)
     }
-}
-
-fn is_hidden(entry: &DirEntry) -> bool {
-    entry
-        .file_name()
-        .to_str()
-        .map(|s| s.starts_with('.'))
-        .unwrap_or(false)
-}
-
-fn is_markdown(entry: &DirEntry) -> bool {
-    entry.path().extension().map(|s| s == "md").unwrap_or(false)
 }
 
 pub struct Vault {
