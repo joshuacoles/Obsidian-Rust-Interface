@@ -38,7 +38,7 @@ pub struct VaultNote<T> {
 }
 
 impl<T: Serialize> VaultNote<T> {
-    fn write(&self) -> Result<()> {
+    pub fn write(&self) -> Result<()> {
         let contents = format!(
             "---\n{}---\n{}",
             serde_yaml::to_string(&self.metadata)?,
