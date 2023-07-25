@@ -26,11 +26,18 @@ pub enum Error {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct VaultNote {
+pub struct NoteReference {
     path: PathBuf,
 }
 
-impl VaultNote {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct VaultNote<T> {
+    path: PathBuf,
+    metadata: T,
+    content: String
+}
+
+impl NoteReference {
     pub fn path(&self) -> &Path {
         &self.path
     }
@@ -66,6 +73,16 @@ impl VaultNote {
     pub fn metadata<T: DeserializeOwned>(&self) -> Result<T> {
         self.parts()?.0.ok_or(MissingMetadata)
     }
+
+    pub fn parse<T: DeserializeOwned>(&self) -> Result<VaultNote<T>> {
+        let (metadata, content) = self.parts()?;
+        let metadata = metadata.ok_or(MissingMetadata)?;
+        Ok(VaultNote {
+            path: self.path.clone(),
+            metadata,
+            content,
+        })
+    }
 }
 
 pub struct Vault {
@@ -79,7 +96,7 @@ impl Vault {
         }
     }
 
-    pub fn notes(&self) -> impl Iterator<Item = Result<VaultNote>> {
+    pub fn notes(&self) -> impl Iterator<Item=Result<NoteReference>> {
         let walker = WalkDir::new(&self.root).into_iter();
         walker
             .filter_entry(|e| !is_hidden(e))
@@ -87,7 +104,7 @@ impl Vault {
             .filter(|e| !is_hidden(e) && is_markdown(e))
             .map(|entry| {
                 let path = entry.path().to_path_buf();
-                Ok(VaultNote { path })
+                Ok(NoteReference { path })
             })
     }
 }
