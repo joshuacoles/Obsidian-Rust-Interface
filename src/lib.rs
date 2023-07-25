@@ -74,6 +74,10 @@ impl NoteReference {
         self.parts()?.0.ok_or(MissingMetadata)
     }
 
+    pub fn from_path(path: &Path) -> NoteReference {
+        NoteReference { path: path.to_path_buf() }
+    }
+
     pub fn parse<T: DeserializeOwned>(&self) -> Result<VaultNote<T>> {
         let (metadata, content) = self.parts()?;
         let metadata = metadata.ok_or(MissingMetadata)?;
