@@ -37,6 +37,19 @@ pub struct VaultNote<T> {
     pub content: String
 }
 
+impl<T: Serialize> VaultNote<T> {
+    fn write(&self) -> Result<()> {
+        let contents = format!(
+            "---\n{}---\n{}",
+            serde_yaml::to_string(&self.metadata)?,
+            self.content
+        );
+
+        std::fs::write(&self.path, contents)?;
+        Ok(())
+    }
+}
+
 impl NoteReference {
     pub fn path(&self) -> &Path {
         &self.path
