@@ -33,8 +33,8 @@ pub struct NoteReference {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct VaultNote<T> {
     path: PathBuf,
-    metadata: T,
-    content: String
+    pub metadata: T,
+    pub content: String
 }
 
 impl NoteReference {
