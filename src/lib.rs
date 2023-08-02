@@ -54,6 +54,12 @@ impl<T: Serialize> VaultNote<T> {
     }
 }
 
+impl<T> VaultNote<T> {
+    fn path(&self) -> &Path {
+        &self.path
+    }
+}
+
 impl NoteReference {
     pub fn path(&self) -> &Path {
         &self.path
