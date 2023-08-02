@@ -22,7 +22,7 @@ pub mod strategies {
     }
 
     pub struct Branded {
-        brand_key: String,
+        pub brand_key: String,
     }
 
     impl<K: DeserializeOwned> Strategy<K> for Branded {
@@ -35,10 +35,10 @@ pub mod strategies {
     }
 
     pub struct TypeAndKey {
-        type_key: String,
-        note_type: String,
+        pub type_key: String,
+        pub note_type: String,
 
-        id_key: String,
+        pub id_key: String,
     }
 
     impl<K: DeserializeOwned> Strategy<K> for TypeAndKey {
