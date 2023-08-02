@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use utils::{is_hidden, is_markdown};
 use walkdir::WalkDir;
 
+mod joining;
 mod utils;
 
 type Result<T> = std::result::Result<T, Error>;
@@ -23,6 +24,9 @@ pub enum Error {
 
     #[error("Error parsing yaml metadata {0:?}")]
     MetadataError(#[from] serde_yaml::Error),
+
+    #[error("Vault was malformed: {0}")]
+    MalformedVault(String),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,7 +38,7 @@ pub struct NoteReference {
 pub struct VaultNote<T> {
     path: PathBuf,
     pub metadata: T,
-    pub content: String
+    pub content: String,
 }
 
 impl<T: Serialize> VaultNote<T> {
@@ -88,7 +92,9 @@ impl NoteReference {
     }
 
     pub fn from_path(path: &Path) -> NoteReference {
-        NoteReference { path: path.to_path_buf() }
+        NoteReference {
+            path: path.to_path_buf(),
+        }
     }
 
     pub fn parse<T: DeserializeOwned>(&self) -> Result<VaultNote<T>> {
@@ -113,7 +119,7 @@ impl Vault {
         }
     }
 
-    pub fn notes(&self) -> impl Iterator<Item=Result<NoteReference>> {
+    pub fn notes(&self) -> impl Iterator<Item = Result<NoteReference>> {
         let walker = WalkDir::new(&self.root).into_iter();
         walker
             .filter_entry(|e| !is_hidden(e))
