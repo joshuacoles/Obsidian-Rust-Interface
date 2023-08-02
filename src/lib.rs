@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use utils::{is_hidden, is_markdown};
 use walkdir::WalkDir;
 
-mod joining;
+pub mod joining;
 mod utils;
 
 type Result<T> = std::result::Result<T, Error>;
