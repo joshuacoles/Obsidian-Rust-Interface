@@ -1,18 +1,21 @@
+use std::collections::HashMap;
+use std::hash::Hash;
 use crate::Error::MalformedVault;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use tracing::debug;
 
 use crate::joining::WriteOutcome::*;
+use crate::{NoteReference, Vault};
+use crate::joining::strategies::Strategy;
 
-mod strategies {
+pub mod strategies {
     use serde::de::DeserializeOwned;
     use serde_yaml::from_value;
-    use std::collections::HashMap;
     use std::hash::Hash;
 
     use crate::joining::WriteOutcome::*;
-    use crate::{NoteReference, Vault};
+    use crate::NoteReference;
 
     pub trait Strategy<K> {
         fn extract(&self, note_reference: NoteReference) -> Option<(K, NoteReference)>;
@@ -52,17 +55,17 @@ mod strategies {
             Some((id, note_reference))
         }
     }
+}
 
-    pub fn find_by<S: Strategy<K>, K>(vault: &Vault, strategy: &S) -> HashMap<K, NoteReference>
+pub fn find_by<S: Strategy<K>, K>(vault: &Vault, strategy: &S) -> HashMap<K, NoteReference>
     where
         K: Eq + Hash,
-    {
-        vault
-            .notes()
-            .filter_map(|n| n.ok())
-            .filter_map(|n| strategy.extract(n))
-            .collect()
-    }
+{
+    vault
+        .notes()
+        .filter_map(|n| n.ok())
+        .filter_map(|n| strategy.extract(n))
+        .collect()
 }
 
 /// A joined note is a note that corresponds with some resource outside of Obsidian.
