@@ -101,13 +101,16 @@ impl<K, T: Serialize> JoinedNote<K, T> {
 
         debug!("Writing note to {:?}", &path);
 
-        let contents = format!(
+        let contents = self.assemble()?;
+        std::fs::write(path, contents)?;
+        Ok(outcome)
+    }
+
+    pub fn assemble(&self) -> Result<String, crate::Error> {
+        Ok(format!(
             "---\n{}---\n{}",
             serde_yaml::to_string(&self.metadata)?,
             self.contents
-        );
-
-        std::fs::write(path, contents)?;
-        Ok(outcome)
+        ))
     }
 }
