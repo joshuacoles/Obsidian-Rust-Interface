@@ -1,21 +1,18 @@
-use std::collections::HashMap;
-use std::hash::Hash;
 use crate::Error::MalformedVault;
 use serde::Serialize;
+use std::collections::HashMap;
+use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use tracing::debug;
 
+use crate::joining::strategies::Strategy;
 use crate::joining::WriteOutcome::*;
 use crate::{NoteReference, Vault};
-use crate::joining::strategies::Strategy;
 
 pub mod strategies {
+    use crate::NoteReference;
     use serde::de::DeserializeOwned;
     use serde_yaml::from_value;
-    use std::hash::Hash;
-
-    use crate::joining::WriteOutcome::*;
-    use crate::NoteReference;
 
     pub trait Strategy<K> {
         fn extract(&self, note_reference: NoteReference) -> Option<(K, NoteReference)>;
@@ -58,8 +55,8 @@ pub mod strategies {
 }
 
 pub fn find_by<S: Strategy<K>, K>(vault: &Vault, strategy: &S) -> HashMap<K, NoteReference>
-    where
-        K: Eq + Hash,
+where
+    K: Eq + Hash,
 {
     vault
         .notes()
@@ -110,7 +107,7 @@ impl<K, T: Serialize> JoinedNote<K, T> {
             self.contents
         );
 
-        std::fs::write(&path, contents)?;
+        std::fs::write(path, contents)?;
         Ok(outcome)
     }
 }

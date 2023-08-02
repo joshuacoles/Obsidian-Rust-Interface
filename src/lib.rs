@@ -59,7 +59,9 @@ impl NoteReference {
         &self.path
     }
 
-    pub fn to_path_buf(self) -> PathBuf { self.path }
+    pub fn to_path_buf(self) -> PathBuf {
+        self.path
+    }
 
     pub fn parts<T: DeserializeOwned>(&self) -> Result<(Option<T>, String)> {
         let content = std::fs::read_to_string(&self.path)?;
