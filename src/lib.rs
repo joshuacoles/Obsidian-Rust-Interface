@@ -29,7 +29,7 @@ pub enum Error {
     MalformedVault(String),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct NoteReference {
     path: PathBuf,
 }
